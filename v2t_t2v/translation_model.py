@@ -2,7 +2,7 @@ import torch
 from   transformers import AutoTokenizer, AutoModelForCausalLM
 import gc
 
-PROMPT           =  "당신은 번역기입니다. 영어를 한국어로 문맥에 맞게 자연스럽게 번역하세요"
+PROMPT           =  "당신은 번역기입니다. 영어를 한국어로 자연스럽게 번역하세요"
 MODEL_NAME       =  "nayohan/llama3-instrucTrans-enko-8b"
 
 def translation(response):

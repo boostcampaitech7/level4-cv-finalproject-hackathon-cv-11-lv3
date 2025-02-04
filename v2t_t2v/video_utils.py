@@ -4,81 +4,19 @@ from moviepy     import VideoFileClip
 from PIL         import Image
 import torch
 import numpy     as np
-import librosa
-import tempfile
 
 IMAGENET_MEAN       = (0.485, 0.456, 0.406)
 IMAGENET_STD        = (0.229, 0.224, 0.225)
 
-def time_to_seconds(time_str : str):
+def time_to_seconds(time_str):
     try:
         hh, mm, ss, ff = map(int, time_str.split(':'))
         return hh * 3600 + mm * 60 + ss + ff / 30
-    
     except ValueError:
         raise ValueError("Time format should be HH:MM:SS:FF")
 
-def get_video_duration(video_path : str):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_file:
-        temp_file.write(video_path.read())
-        temp_video_path = temp_file.name
-    try:
-        with VideoFileClip(temp_video_path) as video:
-            duration    = video.duration
-            return temp_video_path, duration
-    except Exception as e:
-        print(f"❌ 비디오 정보를 가져오는 중 오류 발생: {e}")
-        return None,None
-
-def get_default_times(video_duration):
-    start_time   = "00:00:00:00"
-
-    if video_duration:
-        hh       = int(video_duration // 3600)
-        mm       = int((video_duration % 3600) // 60)
-        ss       = int(video_duration % 60)
-        end_time = f"{hh:02d}:{mm:02d}:{ss:02d}:00"
-    else:
-        end_time = "00:00:30:00"
-
-    return start_time, end_time
-
-def cut_video_moviepy(video_path  : str, 
-                      start_time  : int, 
-                      end_time    : int, 
-                      output_path : str):
-    try :
-        print(f"🎬 비디오를 파일 처리 중 : {video_path}")
-        with VideoFileClip(video_path) as video:
-            print(f"📏 비디오 길이: {video.duration} 초")
-            print(f"🎞️ 프레임 속도(FPS): {video.fps}")
-            print(f"📐 비디오 해상도: {video.size}")
-            
-            if start_time >= video.duration or end_time > video.duration:
-                raise ValueError("❌ 시작 또는 종료 시간이 비디오 길이를 초과합니다.")
-            
-            if start_time >= end_time:
-                raise ValueError("❌ 시작 시간이 종료 시간보다 커서는 안 됩니다.")
-            
-            subclip = video.subclipped(start_time, end_time)
-            
-            with tempfile.NamedTemporaryFile(delete = False, 
-                                             suffix = ".mp4") as temp_out:
-                output_path = temp_out.name
-                print(f"💾 잘라낸 비디오 저장 중: {output_path}")
-                
-                subclip.write_videofile(output_path,
-                                        codec       = "libx264",
-                                        audio_codec = "aac")
-                
-            print("✅ 비디오 잘라내기 완료!")
-            return output_path
-        
-    except Exception as e:
-        raise RuntimeError(f"⚠️ MoviePy 오류 발생: {e}")
-    
-def extract_audio_np(video_path : str, 
-                     target_sr  = 16000):
+def extract_audio_np(video_path, 
+                     target_sr=16000):
     
     clip            =  VideoFileClip(video_path)
     audio_clip      =  clip.audio
@@ -90,7 +28,7 @@ def extract_audio_np(video_path : str,
         
     return audio_array, target_sr
 
-def build_transform(input_size : int):
+def build_transform(input_size):
     return T.Compose([
            T.Lambda(lambda img : img.convert("RGB") if img.mode != "RGB" else img),
            T.Resize((input_size, input_size), interpolation = T.InterpolationMode.BICUBIC),
@@ -120,7 +58,7 @@ def get_index(bound        = None,
     
     return frame_indices
 
-def load_video(video_path  : str, 
+def load_video(video_path, 
                bound       = None, 
                input_size  = 448,  
                num_segment = 32):
@@ -158,20 +96,3 @@ def load_video(video_path  : str,
         
     pixel_value       = torch.stack(pixel_values_list)
     return pixel_value, timestamp
-
-def extract_audio_np(video : str):
-    clip            = VideoFileClip(video)
-    audio_clip      = clip.audio
-    audio_array     = audio_clip.to_soundarray()
-    clip.close()
-    
-    if audio_array.ndim == 2:
-        audio_array = np.mean(audio_array, 
-                              axis = 1)
-
-    audio_array     = librosa.resample(audio_array, 
-                                       orig_sr   = audio_clip.fps,
-                                       target_sr = 16000)
-    
-    audio_array     = librosa.util.normalize(audio_array) * 0.95
-    return audio_array
