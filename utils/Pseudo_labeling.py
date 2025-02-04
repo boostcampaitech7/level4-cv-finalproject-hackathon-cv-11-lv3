@@ -47,11 +47,11 @@ def parse_args():
                         help="JSON 병합 결과를 저장할 경로 (옵션)")
 
     parser.add_argument("--exclude_last_seconds", type=int, default=30,
-                        help="씬 검출 시 마지막 N초 구간을 제외 (기본=30)")
-    parser.add_argument("--pyscene_threshold", type=float, default=30.0,
-                        help="PySceneDetect ContentDetector threshold (기본=30)")
+                        help="씬 검출 시 마지막 N초 구간을 제외 (기본=0)")
+    parser.add_argument("--pyscene_threshold", type=float, default=28.0,
+                        help="PySceneDetect ContentDetector threshold (기본=28)")
     parser.add_argument("--num_segments", type=int, default=8,
-                        help="한 씬에서 프레임을 몇 덩어리로 샘플링할지 (기본=8)")
+                        help="한 씬에서 프레임을 몇 덩어리로 샘플링할지 (기본=29)")
     parser.add_argument("--input_size", type=int, default=448,
                         help="모델에 들어갈 이미지 크기 (기본=448)")
 
@@ -179,7 +179,8 @@ def load_frames(video_path, start_sec, end_sec, fps, num_segments=8, input_size=
         logging.error(f"Error loading frames: {e}")
         return None
 
-def load_model(model_path="OpenGVLab/InternVL2_5-8B-MPO"):
+def load_model(model_path="/data/ephemeral/home/lora_weight/checkpoint-2456"):
+    base_model = "OpenGVLab/InternVL2_5-1B-MPO"
     try:
         model = AutoModel.from_pretrained(
             model_path,
@@ -188,7 +189,7 @@ def load_model(model_path="OpenGVLab/InternVL2_5-8B-MPO"):
             use_flash_attn=False,
             trust_remote_code=True
         )
-        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True, use_fast=False)
+        tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True, use_fast=False)
         model = model.eval().cuda()
         logging.info("Model loaded successfully.")
         return model, tokenizer
@@ -276,8 +277,8 @@ def pseudo_label_video(
     output_dir,
     done_dir,
     pyscene_threshold=30.0,
-    exclude_last_seconds=30,
-    num_segments=8,
+    exclude_last_seconds=0,
+    num_segments=29,
     input_size=448,
     generation_config=None,
     duration_mode="scene"
@@ -432,9 +433,9 @@ def main():
         "early_stopping": True,     
         "no_repeat_ngram_size": 3,  
         "length_penalty": 1.0,
-        "top_k": 50,
-        "top_p": 0.7,
-        "temperature": 0.4,
+        # "top_k": 50,
+        # "top_p": 0.7,
+        # "temperature": 0.4,
     }
 
     model, tokenizer = load_model()
