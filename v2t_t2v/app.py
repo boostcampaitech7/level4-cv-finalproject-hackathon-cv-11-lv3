@@ -1,5 +1,5 @@
 import streamlit as st
-from   v2t_models.v2t_model  import  analyze_video
+from   v2t_models.v2t_model   import  analyze_video
 from   video_utils            import (get_video_duration,
                                       get_default_times,
                                       time_to_seconds,
