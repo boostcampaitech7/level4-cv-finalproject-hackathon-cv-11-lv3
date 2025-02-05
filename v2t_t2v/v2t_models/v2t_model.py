@@ -1,12 +1,12 @@
 import torch
 import gc
-from   video_utils  import (load_video, 
-                            extract_audio_np)
-from   transformers import (AutoTokenizer,
-                            AutoModel)
-from   audio_model  import  transcribe_audio
+from   video_utils             import (load_video, 
+                                       extract_audio_np)
+from   transformers            import (AutoTokenizer,
+                                       AutoModel)
+from   v2t_models.audio_model  import  transcribe_audio
 
-LORA_MODEL_PATH  = "/data/ephemeral/home/lora_epoch/checkpoint-2456"
+LORA_MODEL_PATH  = "/data/ephemeral/home/checkpoint-2456"
 BASE_MODEL_PATH  = "OpenGVLab/InternVL2_5-1B-MPO"
 VIDEO_PATH       = "/data/ephemeral/home/videos_movieclips_461/1ESVngpn1aA.mp4"
 NUM_SEGMENTS     = 32
@@ -25,20 +25,20 @@ PROMPT           = (
                    )
 
 GENERATION_CONFIG = {
-                    "max_new_tokens": 512,
+                    "max_new_tokens": 4096,
                     "do_sample": False,
-                    "num_beams": 3,
+                    "num_beams": 2,
                     "early_stopping": True,     
                     "no_repeat_ngram_size": 3,  
                     "length_penalty": 1.0,
                     }
 
-def analyze_video(video_path = VIDEO_PATH, prompt = PROMPT):
+def analyze_video(video_path : str, prompt = PROMPT):
     model              = AutoModel.from_pretrained(LORA_MODEL_PATH,
                                                    torch_dtype       = torch.bfloat16,
                                                    low_cpu_mem_usage = True,
                                                    use_flash_attn    = False,
-                                                   trust_remote_code = False
+                                                   trust_remote_code = True
                                                    ).eval().cuda()
     
     tokenizer          = AutoTokenizer.from_pretrained(BASE_MODEL_PATH,
@@ -47,18 +47,29 @@ def analyze_video(video_path = VIDEO_PATH, prompt = PROMPT):
     
     pix_val, timestamp = load_video(video_path  = video_path,
                                     num_segment = NUM_SEGMENTS
-                                    ).to(torch.bfloat16).cuda()
+                                    )
+    pix_val            = pix_val.to(torch.bfloat16).cuda()
     
     audio_np           = extract_audio_np(video_path)
     transcript         = transcribe_audio(audio_np)
     
     if transcript.strip():
-        prompt += f"\nAdditionally, the conversation in the video includes the following dialogue: \"{transcript}\""
+        prompt += (
+            f"\n\nIn this video, the following conversation takes place:\n\n"
+            f"\"{transcript}\"\n\n"
+            "Please integrate this dialogue with the visual scene, paying close attention "
+            "to how it reveals or clarifies the participants’ expressions, gestures, and actions, "
+            "as well as the environment or any relevant objects. Provide a cohesive description "
+            "that merges both what is heard and what is seen into a single, detailed narrative."
+        )
+
+        
+    # video_prefix       = "".join([
+    #                               f'Frame{i+1} ({timestamp[i]}): <image>\n'
+    #                               for i in range(pix_val.size(0)) 
+    #                               ])
     
-    video_prefix       = "".join([
-                                  f'Frame{i+1} ({timestamp[i]}): <image>\n'
-                                  for i in range(pix_val.size(0)) 
-                                  ])
+    video_prefix       = f"The following frames from the video are provided: {pix_val.size(0)} images.\n"
     
     query              = video_prefix + prompt
     response, history  = model.chat(tokenizer,
@@ -67,8 +78,13 @@ def analyze_video(video_path = VIDEO_PATH, prompt = PROMPT):
                                     GENERATION_CONFIG,
                                     history        = None,
                                     return_history = True)
-    gc.collect()
-    torch.cuda.empty_cache()
+    
     del model
     del tokenizer
+    
+    torch.cuda.synchronize()
+    
+    gc.collect()
+    torch.cuda.empty_cache()
+    
     return response

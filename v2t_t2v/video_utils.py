@@ -43,37 +43,40 @@ def get_default_times(video_duration):
 
     return start_time, end_time
 
-def cut_video_moviepy(video_path  : str, 
-                      start_time  : int, 
-                      end_time    : int, 
-                      output_path : str):
-    try :
-        print(f"🎬 비디오를 파일 처리 중 : {video_path}")
+def cut_video_moviepy(video_path: str, 
+                      start_time: int, 
+                      end_time: int):
+    try:
+        print(f"🎬 비디오 파일 처리 중: {video_path}")
         with VideoFileClip(video_path) as video:
-            print(f"📏 비디오 길이: {video.duration} 초")
+            duration       = video.duration
+            print(f"📏 비디오 길이: {duration} 초")
             print(f"🎞️ 프레임 속도(FPS): {video.fps}")
             print(f"📐 비디오 해상도: {video.size}")
             
-            if start_time >= video.duration or end_time > video.duration:
-                raise ValueError("❌ 시작 또는 종료 시간이 비디오 길이를 초과합니다.")
+            if start_time >= duration:
+                raise ValueError("❌ 시작 시간이 비디오 길이를 초과합니다.")
+            
+            if end_time > duration:
+                print(f"⚠️ 종료 시간이 비디오 길이를 초과했습니다. {duration}초로 조정합니다.")
+                end_time   = duration
             
             if start_time >= end_time:
-                raise ValueError("❌ 시작 시간이 종료 시간보다 커서는 안 됩니다.")
+                raise ValueError("❌ 시작 시간이 종료 시간보다 크거나 같습니다.")
             
             subclip = video.subclipped(start_time, end_time)
             
-            with tempfile.NamedTemporaryFile(delete = False, 
-                                             suffix = ".mp4") as temp_out:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_out:
                 output_path = temp_out.name
                 print(f"💾 잘라낸 비디오 저장 중: {output_path}")
                 
                 subclip.write_videofile(output_path,
-                                        codec       = "libx264",
-                                        audio_codec = "aac")
+                                        codec="libx264",
+                                        audio_codec="aac")
                 
             print("✅ 비디오 잘라내기 완료!")
-            return output_path
-        
+            return output_path, end_time
+    
     except Exception as e:
         raise RuntimeError(f"⚠️ MoviePy 오류 발생: {e}")
     
@@ -127,8 +130,7 @@ def load_video(video_path  : str,
     
     vr                = VideoReader(video_path, 
                                     ctx         = cpu(0), 
-                                    num_threads = 1,
-                                    num_segment = num_segment)
+                                    num_threads = 1)
     max_frame         = len(vr) - 1
     fps               = float(vr.get_avg_fps())
     
@@ -140,7 +142,7 @@ def load_video(video_path  : str,
                                   fps          = fps, 
                                   max_frame    = max_frame, 
                                   first_idx    = 0, 
-                                  num_segments = 32)
+                                  num_segments = num_segment)
     
     for frame_idx in frame_indices:
         img           = Image.fromarray(
@@ -152,7 +154,7 @@ def load_video(video_path  : str,
         
         seconds       = frame_idx / fps
         minutes       = int(seconds // 60)
-        sec           = seconds & 60
+        sec           = seconds % 60
         timestamp_str = f"{minutes:02d}:{sec:05.2f}"
         timestamp.append(timestamp_str)
         

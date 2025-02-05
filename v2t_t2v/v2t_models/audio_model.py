@@ -24,8 +24,12 @@ def transcribe_audio(audio_np, sr = 16000):
                                     dim = -1)
     transcription   = audio_processor.tokenizer.decode(predicted_ids[0].tolist())
     
-    gc.collect()
-    torch.cuda.empty_cache()
     del audio_model
     del audio_processor
+    
+    torch.cuda.synchronize()
+    
+    gc.collect()
+    torch.cuda.empty_cache()
+    
     return transcription
