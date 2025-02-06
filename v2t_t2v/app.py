@@ -61,10 +61,10 @@ with tab1:
                 result_text     = analyze_video(video_path = st.session_state.clipped_video_path,
                                                 sr         = False)
                 
-                # translated_text = API_translator(response = result_text,
-                #                                  kr2en    = False)
-                translated_text = DL_translator(response  = result_text, 
+                translated_text = API_translator(response = result_text,
                                                  kr2en    = False)
+                # translated_text = DL_translator(response  = result_text, 
+                #                                  kr2en    = False)
                 st.success("✅ 추론 완료!")
                 st.text_area("📝 생성된 텍스트\n", translated_text, height=250)
 

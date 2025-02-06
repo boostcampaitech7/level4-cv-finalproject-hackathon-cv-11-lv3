@@ -1,11 +1,12 @@
-from torchvision import transforms as T
-from decord      import VideoReader, cpu
-from moviepy     import VideoFileClip
-from PIL         import Image
-from pydub       import AudioSegment
-from time        import time
+from   torchvision import transforms as T
+from   decord      import VideoReader, cpu
+from   moviepy     import VideoFileClip
+from   PIL         import Image
+from   pydub       import AudioSegment
+from   time        import time
 import torch
-import numpy     as np
+import cv2
+import numpy       as np
 import librosa
 import tempfile
 
@@ -152,7 +153,7 @@ def load_video(video_path  : str,
     
     vr                = VideoReader(video_path, 
                                     ctx         = cpu(0), 
-                                    num_threads = 1)
+                                    num_threads = 8)
     max_frame         = len(vr) - 1
     fps               = float(vr.get_avg_fps())
     
@@ -167,9 +168,13 @@ def load_video(video_path  : str,
                                   num_segments = num_segment)
     
     for frame_idx in frame_indices:
-        img           = Image.fromarray(
-                        vr[frame_idx].asnumpy()
-                        ).convert("RGB")
+        frame_np     = vr[frame_idx].asnumpy()
+        frame_np      = cv2.cvtColor(frame_np, cv2.COLOR_RGB2BGR)
+        img           = Image.fromarray(frame_np)
+        
+        # img           = Image.fromarray(
+        #                 vr[frame_idx].asnumpy()
+        #                 ).convert("RGB")
         
         img           = transform(img)
         pixel_values_list.append(img)
