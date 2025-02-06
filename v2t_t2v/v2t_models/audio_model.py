@@ -1,12 +1,17 @@
 import torch
-import numpy as np
+import speech_recognition as sr
+import numpy              as np
 import gc
-from   transformers import (Wav2Vec2ForCTC,
-                            Wav2Vec2Processor)
+import os
+from   transformers       import (Wav2Vec2ForCTC,
+                                  Wav2Vec2Processor)
+from   video_utils        import (extract_auido,
+                                  time_count)
 
 AUDIO_MODEL = "facebook/wav2vec2-large-960h-lv60-self"
 
-def transcribe_audio(audio_np, sr = 16000):
+@time_count
+def MODEL_transcribe_audio(audio_np, sr = 16000):
     audio_processor = Wav2Vec2Processor.from_pretrained(AUDIO_MODEL)
     audio_model     = Wav2Vec2ForCTC.from_pretrained(AUDIO_MODEL).to("cuda")
     
@@ -32,4 +37,22 @@ def transcribe_audio(audio_np, sr = 16000):
     gc.collect()
     torch.cuda.empty_cache()
     
+    return transcription
+
+@time_count
+def SR_transcribe_audio(video_path : str):
+    recognizer     = sr.Recognizer()
+    temp_file_path = extract_auido(video_path = video_path)
+    
+    with sr.AudioFile(temp_file_path) as source:
+        audio_data = recognizer.record(source)  # 오디오 파일 로드
+        try:
+            transcription = recognizer.recognize_google(audio_data)  # Google STT
+            return transcription
+        except sr.UnknownValueError:
+            return "음성을 인식할 수 없습니다."
+        except sr.RequestError:
+            return "Google STT API에 접근할 수 없습니다."
+    
+    os.remove(temp_file_path)
     return transcription

@@ -1,9 +1,7 @@
-from   v2t_models.translation_model import (DL_translation,
+from   v2t_models.translation_model import (DL_translator,
                                             API_translator)
 from   v2t_models.v2t_model         import  analyze_video
 from   video_utils                  import (get_video_duration,
-                                            get_default_times,
-                                            time_to_seconds,
                                             cut_video_moviepy)
 import streamlit as st
 
@@ -40,12 +38,11 @@ with tab1:
             
             if st.button("✂️ 비디오 처리하기"):
                 try:
-                    # cut_video_moviepy에서 조정된 end_time 받을 수 있음
+
                     clipped_video_path, used_end_time   = cut_video_moviepy(temp_video_path,
                                                                            start_time,
                                                                            end_time)
-                    
-                    # ✅ 비디오 클립을 유지 (새로운 비디오가 업로드되기 전까지)
+            
                     st.session_state.clipped_video_path = clipped_video_path
                     st.success("✅ 비디오 클립이 성공적으로 생성되었습니다!")
                     
@@ -55,16 +52,19 @@ with tab1:
                 except Exception as e:
                     st.error(f"❌ 비디오 처리 오류: {e}")
 
-    # ✅ 기존 비디오 클립 유지
     if st.session_state.clipped_video_path:
         st.video(st.session_state.clipped_video_path)
 
     if st.session_state.clipped_video_path and st.button("📜 비디오 내용 분석하기"):
         with st.spinner("추론 중... 잠시만 기다려 주세요!"):
             try:
-                result_text     = analyze_video(st.session_state.clipped_video_path)
-                translated_text = API_translator(response = result_text, 
-                                                 kr2en = False)
+                result_text     = analyze_video(video_path = st.session_state.clipped_video_path,
+                                                sr         = False)
+                
+                # translated_text = API_translator(response = result_text,
+                #                                  kr2en    = False)
+                translated_text = DL_translator(response  = result_text, 
+                                                 kr2en    = False)
                 st.success("✅ 추론 완료!")
                 st.text_area("📝 생성된 텍스트\n", translated_text, height=250)
 

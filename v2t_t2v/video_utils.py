@@ -2,6 +2,8 @@ from torchvision import transforms as T
 from decord      import VideoReader, cpu
 from moviepy     import VideoFileClip
 from PIL         import Image
+from pydub       import AudioSegment
+from time        import time
 import torch
 import numpy     as np
 import librosa
@@ -9,6 +11,16 @@ import tempfile
 
 IMAGENET_MEAN       = (0.485, 0.456, 0.406)
 IMAGENET_STD        = (0.229, 0.224, 0.225)
+
+def time_count(func):
+    def wrapper(*arg, **kwargs):
+        start_time = time()
+        result = func(*arg, **kwargs)
+        end_time = time()
+        elapsed_time = end_time - start_time
+        print(f"⏳{func.__name__} 실행 시간: {elapsed_time:.6f}초")
+        return result
+    return wrapper
 
 def time_to_seconds(time_str : str):
     try:
@@ -92,6 +104,16 @@ def extract_audio_np(video_path : str,
         audio_array =  np.mean(audio_array, axis=1)
         
     return audio_array, target_sr
+
+def extract_auido(video_path : str):
+    with tempfile.NamedTemporaryFile(suffix = ".wav",
+                                     delete = False) as temp_wav:
+        temp_wav_path = temp_wav.name
+        
+    clip = VideoFileClip(video_path)
+    clip.audio.write_audiofile(temp_wav_path, codec="pcm_s16le")
+    clip.audio.close()
+    return temp_wav_path
 
 def build_transform(input_size : int):
     return T.Compose([

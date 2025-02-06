@@ -1,14 +1,16 @@
 from   deep_translator import  GoogleTranslator
 from   transformers    import (AutoTokenizer,
                                AutoModelForCausalLM)
+from   video_utils     import  time_count
 import gc
 import torch
 
-EN2KR_PROMPT     =  "당신은 번역기입니다. 영어를 한국어로 문맥에 맞게 자연스럽게 번역하세요"
-KR2EN_PROMPT     =  "당신은 번역기입니다. 한국어를 영어로 문맥에 맞게 자연스럽게 번역하세요"
+EN2KR_PROMPT     =  "당신은 번역기입니다. 영어를 한국어로 문맥에 맞게 번역하세요"
+KR2EN_PROMPT     =  "당신은 번역기입니다. 한국어를 영어로 문맥에 맞게 번역하세요"
 MODEL_NAME       =  "nayohan/llama3-instrucTrans-enko-8b"
 
-def DL_translation(response : str, 
+@time_count
+def DL_translator(response : str, 
                    kr2en    : bool = False):
     
     if kr2en:
@@ -41,7 +43,8 @@ def DL_translation(response : str,
     gc.collect()
     torch.cuda.empty_cache()
     return output_text
-    
+
+@time_count
 def API_translator(response : str,
                    kr2en    : bool = False):
     if kr2en:

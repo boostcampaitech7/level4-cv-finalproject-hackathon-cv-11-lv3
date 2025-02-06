@@ -1,10 +1,12 @@
 import torch
 import gc
 from   video_utils             import (load_video, 
-                                       extract_audio_np)
+                                       extract_audio_np,
+                                       time_count)
 from   transformers            import (AutoTokenizer,
                                        AutoModel)
-from   v2t_models.audio_model  import  transcribe_audio
+from   v2t_models.audio_model  import (MODEL_transcribe_audio,
+                                       SR_transcribe_audio)
 
 LORA_MODEL_PATH  = "/data/ephemeral/home/checkpoint-2456"
 BASE_MODEL_PATH  = "OpenGVLab/InternVL2_5-1B-MPO"
@@ -33,7 +35,10 @@ GENERATION_CONFIG = {
                     "length_penalty": 1.0,
                     }
 
-def analyze_video(video_path : str, prompt = PROMPT):
+@time_count
+def analyze_video(video_path : str, 
+                  prompt     : str  = PROMPT, 
+                  sr         : bool = True):
     model              = AutoModel.from_pretrained(LORA_MODEL_PATH,
                                                    torch_dtype       = torch.bfloat16,
                                                    low_cpu_mem_usage = True,
@@ -50,8 +55,15 @@ def analyze_video(video_path : str, prompt = PROMPT):
                                     )
     pix_val            = pix_val.to(torch.bfloat16).cuda()
     
-    audio_np           = extract_audio_np(video_path)
-    transcript         = transcribe_audio(audio_np)
+    if sr:
+        # SpeechRecognition
+        transcript         = SR_transcribe_audio(video_path = video_path)
+        print(transcript)
+    else:
+        # Wav2Vec2 MODEL
+        audio_np           = extract_audio_np(video_path)
+        transcript         = MODEL_transcribe_audio(audio_np)
+        print(transcript)    
     
     if transcript.strip():
         prompt += (
@@ -64,10 +76,10 @@ def analyze_video(video_path : str, prompt = PROMPT):
         )
 
         
-    # video_prefix       = "".join([
-    #                               f'Frame{i+1} ({timestamp[i]}): <image>\n'
-    #                               for i in range(pix_val.size(0)) 
-    #                               ])
+    video_prefix       = "".join([
+                                  f'Frame{i+1} ({timestamp[i]}): <image>\n'
+                                  for i in range(pix_val.size(0)) 
+                                  ])
     
     video_prefix       = f"The following frames from the video are provided: {pix_val.size(0)} images.\n"
     
