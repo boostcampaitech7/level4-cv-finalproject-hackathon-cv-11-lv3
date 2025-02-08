@@ -110,7 +110,7 @@ def get_videos(directory, extensions=('.mp4','.avi','.mkv','.mov')):
     logging.info(f"Found {len(video_paths)} videos in {directory}")
     return video_paths
 
-def detect_scenes(video_path, threshold=30.0, exclude_last_seconds=30):
+def detect_scenes(video_path, threshold=30.0, exclude_last_seconds=30, retry=True):
     """
     PySceneDetect로 씬을 검출, 마지막 exclude_last_seconds 구간은 무시.
     """
@@ -136,6 +136,14 @@ def detect_scenes(video_path, threshold=30.0, exclude_last_seconds=30):
             end_sec   = end.get_seconds()
             if end_sec <= total_duration - exclude_last_seconds:
                 valid_scenes.append((start_sec, end_sec))
+
+        if len(valid_scenes) < 5 and retry and threshold != 10:
+            logging.info("씬이 5개 미만이라 threshold=10으로 재시도합니다.")
+            return detect_scenes(video_path, threshold=10, exclude_last_seconds=exclude_last_seconds, retry=False)
+        
+        if len(valid_scenes) > 40 and retry and threshold != 40:
+            logging.info(f"씬이 {len(valid_scenes)} > 40, threshold=40으로 재시도합니다.")
+            return detect_scenes(video_path, threshold=40, exclude_last_seconds=exclude_last_seconds, retry=False)
 
         return valid_scenes, total_duration
     except Exception as e:
