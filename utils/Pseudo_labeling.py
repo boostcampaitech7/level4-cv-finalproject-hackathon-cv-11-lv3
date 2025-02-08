@@ -61,6 +61,8 @@ def parse_args():
                               " scene=마지막 씬 종료시점,"
                               " subtract=전체 길이에서 exclude_last_seconds 뺀 값,"
                               " full=영상 전체 길이"))
+    parser.add_argument("--batch_size", type=int, default=1,
+                        help="모델이 한번에 추론하는 씬 갯수")
     
     args = parser.parse_args()
 
@@ -145,7 +147,8 @@ def build_transform(input_size=448):
         T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
         T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
         T.ToTensor(),
-        T.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)
+        T.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        T.ConvertImageDtype(torch.bfloat16)
     ])
 
 def get_index(start_sec, end_sec, fps, num_segments=8):
@@ -197,21 +200,26 @@ def load_model(model_path="/data/ephemeral/home/lora_weight/checkpoint-2456"):
         logging.error(f"Error loading model: {e}")
         sys.exit(1)
 
-def generate_caption(pixel_values, question, generation_config, model, tokenizer):
+def generate_batch_caption(pixel_values, questions, generation_config, model, tokenizer, num_patches_list):
     try:
-        pixel_values = pixel_values.to(torch.bfloat16).cuda()
-        frames_text = ''.join([f'Frame{i+1}: <image>\n' for i in range(pixel_values.size(0))])
-        query = frames_text + question
-
-        response, history = model.chat(
+        pixel_values = pixel_values.cuda()
+        
+        queries = []
+        start_idx = 0
+        for i, num in enumerate(num_patches_list):
+            frames_text = ''.join([f'Frame{j+1}: <image>\n' for j in range(num)])
+            sample_question = questions[i] if isinstance(questions, list) else questions
+            queries.append(frames_text + sample_question)
+            start_idx += num
+        
+        responses = model.batch_chat(
             tokenizer,
             pixel_values,
-            query,
-            generation_config,
-            history=None,
-            return_history=True
+            num_patches_list=num_patches_list,
+            questions=queries,
+            generation_config=generation_config
         )
-        return response
+        return responses
     except Exception as e:
         logging.error(f"Error generating caption: {e}")
         return ""
@@ -281,7 +289,8 @@ def pseudo_label_video(
     num_segments=29,
     input_size=448,
     generation_config=None,
-    duration_mode="scene"
+    duration_mode="scene",
+    batch_size=1
 ):
     if generation_config is None:
         generation_config = {
@@ -301,18 +310,43 @@ def pseudo_label_video(
     vr = VideoReader(video_path, ctx=cpu(0), num_threads=1)
     fps = float(vr.get_avg_fps())
 
-    captions = []
-    for (start_sec, end_sec) in tqdm(scenes, desc=f"Processing {video_id} Scenes"):
-        pixel_values = load_frames(
-            video_path, start_sec, end_sec,
-            fps, num_segments=num_segments, input_size=input_size
-        )
-        if pixel_values is None:
-            captions.append("")
-            continue
+    captions = [None] * len(scenes)
+    for batch_start in tqdm(range(0, len(scenes), batch_size), desc=f"Processing {video_id} Scenes"):
+        valid_pixel_values = []
+        valid_num_patches = []
+        valid_questions = []
+        valid_indices = []       
 
-        cap = generate_caption(pixel_values, question, generation_config, model, tokenizer)
-        captions.append(cap)
+        batch_slice = list(enumerate(scenes[batch_start:batch_start + batch_size], start=batch_start))
+        for idx, (start_sec, end_sec) in batch_slice:
+            pixel_values = load_frames(
+                video_path, start_sec, end_sec,
+                fps, num_segments=num_segments, input_size=input_size
+            )
+            if pixel_values is None:
+                # 해당 씬의 프레임 로드에 실패하면 빈 캡션을 바로 추가하고, 배치에는 포함하지 않습니다.
+                captions.append("")
+            else:
+                valid_pixel_values.append(pixel_values)
+                valid_num_patches.append(pixel_values.size(0))
+                valid_questions.append(question)
+                valid_indices.append(idx)
+
+        if valid_pixel_values:
+            # 여러 씬의 텐서를 첫 번째 차원(batch 차원)으로 이어 붙임
+            batch_pixel_values_cat = torch.cat(valid_pixel_values, dim=0)
+            # 배치 캡션 생성 (새로 작성한 배치용 generate_caption 함수 호출)
+            batch_captions = generate_batch_caption(
+                batch_pixel_values_cat,
+                valid_questions,
+                generation_config,
+                model,
+                tokenizer,
+                valid_num_patches
+            )
+
+            for idx, cap in zip(valid_indices, batch_captions):
+                captions[idx] = cap
 
     final_json = build_json_data(
         video_id=video_id,
@@ -355,7 +389,7 @@ def re_inference(json_dir, video_dir, output_dir, done_dir,
                  question, model, tokenizer,
                  pyscene_threshold=30.0, exclude_last_seconds=30,
                  num_segments=8, input_size=448, generation_config=None,
-                 duration_mode="scene"):
+                 duration_mode="scene",batch_size=1):
     if generation_config is None:
         generation_config = {
             "max_new_tokens": 256,
@@ -406,7 +440,8 @@ def re_inference(json_dir, video_dir, output_dir, done_dir,
             num_segments=num_segments,
             input_size=input_size,
             generation_config=generation_config,
-            duration_mode=duration_mode
+            duration_mode=duration_mode,
+            batch_size=batch_size
         )
 
 
@@ -455,7 +490,8 @@ def main():
                 num_segments=args.num_segments,
                 input_size=args.input_size,
                 generation_config=generation_config,
-                duration_mode=args.duration_mode
+                duration_mode=args.duration_mode,
+                batch_size = args.batch_size
             )
 
         if args.merge_output_file:
@@ -475,7 +511,8 @@ def main():
             num_segments=args.num_segments,
             input_size=args.input_size,
             generation_config=generation_config,
-            duration_mode=args.duration_mode
+            duration_mode=args.duration_mode,
+            batch_size = args.batch_size
         )
 
         if args.merge_output_file:
