@@ -14,6 +14,7 @@ Youtube-8M에서 제공하는 Movie Clip 데이터셋으로 다음과 같은 구
 
 - 전체 비디오 개수 : 1216개
 
+  
 ## 🚀 빠른 시작
 ### Launch Streamlit
 1. Aistage의 server4로 접속
@@ -69,7 +70,6 @@ streamlit run main.py
 
 ## :computer:서비스 아키텍쳐
 ![image](https://github.com/user-attachments/assets/06bf1ad7-9145-4d8e-a342-f1840cbef735)
-
 
 
 
