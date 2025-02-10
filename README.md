@@ -54,7 +54,7 @@ streamlit run main.py
 2. 스트림릿에 동영상이 모두 로드 되면 '비디오 프로세싱 시작'이라는 버튼이 나타나며 프로세싱을 시작합니다, 최대 10분 가량 걸리는 작업이니 인내심을 가지고 기다려주세요!
 
 <p>
-<img src="https://github.com/user-attachments/assets/123f7a21-f687-4396-aae7-3adc12ef9779">
+<img src="https://github.com/user-attachments/assets/97d3413f-f599-43e0-966c-ded520b6a0a1">
 </p>
 
 3. 프로세싱이 마무리되면 '모든 비디오의 전처리가 완료되었습니다!' 라는 문구와 함께 VectorDB에 입력으로 들어온 비디오 임베딩이 저장됩니다!
