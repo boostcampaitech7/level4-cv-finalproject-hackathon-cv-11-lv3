@@ -61,7 +61,6 @@ def parse_args():
                         help="모델에 들어갈 이미지 크기 (기본=448)")
 
     parser.add_argument("--batch_size",           type=int, default=1,
-
                         help="모델이 한번에 추론하는 씬 갯수")
     
 
@@ -114,7 +113,6 @@ def get_videos(directory,
                 video_paths.append(path)
     logging.info(f"Found {len(video_paths)} videos in {directory}")
     return video_paths
-
 def detect_scenes(video_path, 
                   threshold            = 30.0, 
                   exclude_last_seconds = 30, 
@@ -172,6 +170,7 @@ def build_transform(input_size = 448):
         T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
         T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
         T.ToTensor(),
+
         T.Normalize(mean = IMAGENET_MEAN, std = IMAGENET_STD),
         T.ConvertImageDtype(torch.bfloat16)
     ])
@@ -455,6 +454,7 @@ def merge_json_files(input_dir, output_path):
 
     logging.info(f"Merged JSON saved to {output_path}")
 
+
 def re_inference(json_dir, 
                  video_dir, 
                  output_dir, 
@@ -469,7 +469,6 @@ def re_inference(json_dir,
                  generation_config    = None,
                  duration_mode        = "scene",
                  batch_size           = 1):
-    
     if generation_config is None:
         generation_config = {
             "max_new_tokens": 256,
