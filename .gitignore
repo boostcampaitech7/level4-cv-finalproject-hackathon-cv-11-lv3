@@ -1,0 +1,21 @@
+# python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+
+# 쥬피터 노트북 캐시
+.ipynb_checkpoints/
+
+# 환경 설정
+.env
+.DS_Store
+
+# 모델 웨이트 파일
+*.pth
+*.pt
+*.bin
+*.h5
+*.ckpt
+*.onnx
