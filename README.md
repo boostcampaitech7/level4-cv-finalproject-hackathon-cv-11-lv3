@@ -62,7 +62,7 @@ streamlit run main.py
 ### 4. Text to Frame
 
 <p>
-<img src="/data/ephemeral/home/level4-cv-finalproject-hackathon-cv-11-lv3">
+<img src="https://github.com/user-attachments/assets/97d3413f-f599-43e0-966c-ded520b6a0a1">
 </p>
 
 찾고 싶은 영상의 설명을 한글로 작성 후 '프레임 추출' 버튼을 누르고 잠시 뒤 VectorDB에서 유사도를 검사하여 Top 5의 결과를 보여줍니다!
