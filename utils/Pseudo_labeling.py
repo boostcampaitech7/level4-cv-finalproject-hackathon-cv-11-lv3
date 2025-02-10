@@ -61,6 +61,7 @@ def parse_args():
                         help="모델에 들어갈 이미지 크기 (기본=448)")
 
     parser.add_argument("--batch_size",           type=int, default=1,
+
                         help="모델이 한번에 추론하는 씬 갯수")
     
 
@@ -118,6 +119,7 @@ def detect_scenes(video_path,
                   threshold            = 30.0, 
                   exclude_last_seconds = 30, 
                   retry                = True):
+
     try:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -409,6 +411,7 @@ def pseudo_label_video(
 
             for idx, cap in zip(valid_indices, batch_captions):
                 captions[idx]       = cap
+
 
     final_json = build_json_data(
         video_id             = video_id,
