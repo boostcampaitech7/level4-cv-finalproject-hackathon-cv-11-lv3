@@ -9,7 +9,7 @@ class FlaskVideoProcessor:
     EXTRACTED_FRAMES_DIR = '/data/ephemeral/ys/extracted_frames'
     SERVER1_WEBHOOK_URL  = "https://joins-odd-expense-local.trycloudflare.com/trigger_download"
     SERVER3_WEBHOOK_URL  = "https://missouri-detroit-proc-por.trycloudflare.com/trigger_download"
-    
+    #https://successful-florida-falling-image.trycloudflare.com
     def __init__(self):
         os.makedirs(self.BASE_SAVE_DIR, exist_ok = True)
         os.makedirs(self.RESULT_DIR, exist_ok = True)

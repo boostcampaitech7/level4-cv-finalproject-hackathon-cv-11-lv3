@@ -7,10 +7,10 @@ from   modules.flask_video_preprocess import Text2FrameDistributedInference
 class AppManager:
     def __init__(self):
         self.pages = {
-            "🎬 Video to Text"            : Video2TextPage(),
-            "🎥 Video Preprocessing"      : VideoPreprocessingPage(),
-            "🔎 Text to Frame"            : Text2FramePage(),
-            "🔎 Text to Frame(분산 추론)"  : Text2FrameDistributedInference()
+            "🎬 Video to Text"                : Video2TextPage(),
+            "🎥 Video Preprocessing"          : VideoPreprocessingPage(),
+            "🔎 Text to Frame"                : Text2FramePage(),
+            "🔎 Text to Frame(분산 추론) 🚧"  : Text2FrameDistributedInference()
         }
 
     def run(self):

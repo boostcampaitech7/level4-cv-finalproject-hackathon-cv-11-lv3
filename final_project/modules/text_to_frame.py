@@ -2,9 +2,10 @@ import streamlit            as st
 from   models.translation   import Translator
 from   models.frame_extract import FrameExtractor 
 
-VIDEO_DIR  = "/data/ephemeral/home/videos_movieclips"
-NPZ_FILE   = "/data/ephemeral/home/embeddings_updated.npz"
-OUTPUT_DIR = "/data/ephemeral/home/extracted_frames"
+VIDEO_DIR          = "/data/ephemeral/home/videos_movieclips"
+NPZ_FILE           = "/data/ephemeral/home/movie_clip_AnglE_UAE_Large_V1_features.npz"
+OUTPUT_DIR         = "/data/ephemeral/home/extracted_frames"
+VIDEO_STORAGE_PATH = "/data/ephemeral/home/videos"
 
 class Text2FramePage:
     def run(self):
@@ -20,12 +21,12 @@ class Text2FramePage:
             status_text = st.empty()
             
             with Translator(kr2en = True,
-                            mode  = "DL") as t:
+                            mode  = mode) as t:
                 translated_text = t.translate(input_text)
             print(translated_text)
             
             frame_extractor = FrameExtractor(video_dir1        = VIDEO_DIR,
-                                             video_dir2        = None,
+                                             video_dir2        = VIDEO_STORAGE_PATH,
                                              npz_file          = NPZ_FILE,
                                              output_dir        = OUTPUT_DIR,
                                              top_k             = 5,

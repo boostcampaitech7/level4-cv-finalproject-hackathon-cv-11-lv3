@@ -23,7 +23,7 @@ class AngleSimilarity:
         # self.angle            = AnglE.from_pretrained(model_name, pooling_strategy=pooling_strategy)
         if self.device.lower() == 'cuda':
             self.angle = self.angle.cuda()
-
+        
         self.results    = self.compute_angle_similarity()
         
     def __enter__(self):

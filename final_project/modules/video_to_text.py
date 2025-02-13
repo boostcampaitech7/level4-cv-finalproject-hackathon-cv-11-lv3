@@ -55,6 +55,7 @@ class Video2TextPage:
         st.write("💡 API에서 문제가 발생하면 DL 모드를 사용해보세요! (20~30초 정도 더 소요됩니다.)")
         
         if video_file:
+            print(video_file.name)
             temp_video_path = save_video_file(video_file)
             temp_video_path, video_duration = get_video_duration_ffmpeg(temp_video_path)
 
@@ -110,7 +111,7 @@ class Video2TextPage:
                         with Translator(kr2en = False,
                                         mode  = mode) as t:
                             translated_text = t.translate(response = response)
-                        
+                            print(translated_text)
                         st.success("✅ 추론 완료!")
                         st.text_area("📝 생성된 텍스트", translated_text, height=350)
 

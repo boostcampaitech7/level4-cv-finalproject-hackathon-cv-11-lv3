@@ -360,7 +360,13 @@ class AnalyzeVideo:
 
         for vid_idx, ((shot_frames, shot_times), duration) in enumerate(zip(zip(shot_frames_list, shot_times_list), durations_list)):
             video_path = video_paths[vid_idx]
-            video_id   = os.path.basename(video_path)[-15:-4]
+            
+            base_name = os.path.splitext(os.path.basename(video_path))[0]
+            
+            if len(base_name) < 20:
+                video_id = base_name
+            else:
+                video_id = base_name[-15:-4]
 
             response   = []
 

@@ -5,6 +5,29 @@ import time
 from   models.analyze       import AnalyzeVideo
 from   models.add_embedding import EmbeddingProcessor
 
+VIDEO_STORAGE_PATH = "/data/ephemeral/home/videos"
+
+def save_uploaded_file(uploaded_file, 
+                       save_dir = VIDEO_STORAGE_PATH):
+    
+    os.makedirs(save_dir, exist_ok = True)
+    
+    base_name = os.path.splitext(os.path.basename(uploaded_file.name))[0]
+    
+    if len(base_name) < 20:
+        video_id = base_name
+    else:
+        video_id = base_name[-15:-4]
+        
+    new_filename         = f"{video_id}.mp4"
+    save_path            = os.path.join(save_dir, new_filename)
+    
+    with open(save_path, 'wb') as f:
+        f.write(uploaded_file.getbuffer())
+        
+    print(f"📂 저장된 파일: {uploaded_file.name} -> {save_path}")
+    return save_path, new_filename
+
 class VideoPreprocessingPage:
     def run(self):
         st.title("🎬 Video PreProcessing")
@@ -23,17 +46,14 @@ class VideoPreprocessingPage:
                 
                 status_text.text("📂 비디오 저장중")
                 
-                temp_dir           = tempfile.gettempdir()
-                
                 for uploaded in uploaded_files:
-                    origin_filename = uploaded.name
-                    temp_path       = os.path.join(temp_dir, origin_filename)
+                    save_path, new_filename       = save_uploaded_file(uploaded)
                     
-                    with open(temp_path, "wb") as f:
-                        f.write(uploaded.getbuffer())
-                        
-                    video_paths.append(temp_path)
-                    original_filenames[temp_path] = origin_filename
+                    video_paths.append(save_path)
+                    
+                    original_filenames[save_path] = new_filename
+                    
+                    print(f"📂 원본 파일명: {uploaded.name} -> 저장된 파일명: {new_filename}")
                     
                 time.sleep(1)
                 
@@ -47,6 +67,7 @@ class VideoPreprocessingPage:
                         status_text.text(f"📊 분석 진행 중: {idx+1}/{len(video_paths)} - {original_filenames[video_path]}")
                         av.fast_batch_analyze(video_paths = [video_path],
                                               output_path = "/data/ephemeral/home/json_output")
+                        
                 status_text.text("✅ 모든 비디오가 처리되었습니다!")
                 
                 status_text.text("📜 NPZ 파일 병합 시작")
