@@ -13,11 +13,11 @@ class FrameExtractor:
                  top_k             : int = 5, 
                  sampling_interval : int = 500):
         
-        self.video_dir1 = video_dir1
-        self.video_dir2 = video_dir2
-        self.npz_file = npz_file
-        self.output_dir = output_dir
-        self.top_k = top_k
+        self.video_dir1        = video_dir1
+        self.video_dir2        = video_dir2
+        self.npz_file          = npz_file
+        self.output_dir        = output_dir
+        self.top_k             = top_k
         self.sampling_interval = sampling_interval
         
         os.makedirs(self.output_dir, exist_ok=True)
@@ -40,7 +40,7 @@ class FrameExtractor:
         if len(parts) == 2:
             try:
                 start = float(parts[0])
-                end = float(parts[1])
+                end   = float(parts[1])
                 return start, end
             
             except ValueError:

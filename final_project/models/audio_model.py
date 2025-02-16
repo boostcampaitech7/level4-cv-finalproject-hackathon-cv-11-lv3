@@ -1,14 +1,14 @@
 import torch
-import speech_recognition as sr
-import numpy              as np
 import gc
 import os
 import tempfile
+import librosa
+import speech_recognition as     sr
+import numpy              as     np
 from   time               import time
 from   transformers       import (Wav2Vec2ForCTC, 
                                   Wav2Vec2Processor)
-import librosa
-from   moviepy            import VideoFileClip
+from   moviepy            import  VideoFileClip
 
 AUDIO_MODEL = "facebook/wav2vec2-large-960h-lv60-self"
 
@@ -82,8 +82,7 @@ class AudioExtractor:
         return transcription
     
     def __extract_auido(self):
-        with tempfile.NamedTemporaryFile(suffix = ".wav",
-                                        delete = False) as temp_wav:
+        with tempfile.NamedTemporaryFile(suffix = ".wav", delete = False) as temp_wav:
             temp_wav_path = temp_wav.name
             
         clip = VideoFileClip(self.video_path)

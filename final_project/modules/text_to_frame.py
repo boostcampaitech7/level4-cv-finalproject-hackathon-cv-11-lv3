@@ -1,4 +1,4 @@
-import streamlit            as st
+import streamlit            as     st
 from   models.translation   import Translator
 from   models.frame_extract import FrameExtractor 
 
@@ -20,8 +20,7 @@ class Text2FramePage:
         if st.button("⏳ 프레임 추출 시작"):
             status_text = st.empty()
             
-            with Translator(kr2en = True,
-                            mode  = mode) as t:
+            with Translator(kr2en = True, mode  = mode) as t:
                 translated_text = t.translate(input_text)
             print(translated_text)
             

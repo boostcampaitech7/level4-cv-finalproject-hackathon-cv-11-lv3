@@ -3,7 +3,7 @@ import  os
 import  cv2
 import  json
 import  torch
-import  numpy                  as np
+import  numpy                  as     np
 from    tqdm                   import tqdm
 from    time                   import time
 from    transformers           import (AutoTokenizer,
@@ -14,7 +14,6 @@ from    PIL                    import Image
 from    torchvision            import transforms      as T
 from    models.audio_model     import AudioExtractor
 from    models.video_processor import VideoProcessor
-from    torch.utils.data       import DataLoader, Dataset
     
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD  = [0.229, 0.224, 0.225]
@@ -55,19 +54,6 @@ GENERATION_CONFIG = {
                     "length_penalty": 1.0,
                     }
 
-class VideoFrameDataset(Dataset):
-    def __init__(self, frames, prompt, num_seg):
-        self.frames = frames
-        self.prompt = prompt
-        self.num_seg = num_seg
-
-    def __len__(self):
-        return len(self.frames)
-
-    def __getitem__(self, idx):
-        frame = self.frames[idx]
-        return frame, self.prompt, self.num_seg
-
 class AnalyzeVideo:
     def __init__(self, 
                  use_audio  : bool = True,
@@ -106,7 +92,6 @@ class AnalyzeVideo:
             if self.tokenizer.pad_token_id is None:
                 self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
                 
-            self.g = torch.cuda.CUDAGraph()
     
     def __unload_model(self):
         if self.model is not None:
@@ -121,7 +106,7 @@ class AnalyzeVideo:
     def __build_transform(self):
         return T.Compose([
                T.Resize((self.input_size, self.input_size),
-                        interpolation = T.InterpolationMode.BICUBIC),
+                         interpolation = T.InterpolationMode.BICUBIC),
                T.ToTensor(),
                T.Normalize(mean = IMAGENET_MEAN,
                            std  = IMAGENET_STD)
@@ -132,31 +117,29 @@ class AnalyzeVideo:
                   fps       : int = 64,
                   max_frame : int = 0,
                   first_idx : int = 0):
+        
         start, end = bound if bound else (-100000, 100000)
         
-        start_idx  = max(first_idx, 
-                         round(start * fps))
-        
-        end_idx    = min(round(end * fps),
-                         max_frame)
+        start_idx  = max(first_idx, round(start * fps))
+        end_idx    = min(round(end * fps), max_frame)
         seg_size   = (end_idx - start_idx) / self.num_seg
+        
         frame_indice = np.linspace(start_idx + (seg_size / 2),
                                    end_idx - (seg_size / 2),
                                    self.num_seg,
                                    dtype = int)
         return frame_indice
         
-    def __load_video(self, 
-                     video_path : str):
+    def __load_video(self, video_path : str):
         vr                = VideoReader(video_path,
                                         ctx         = cpu(0), 
                                         num_threads = 1)
+        
         max_frame         = len(vr) - 1
         fps               = float(vr.get_avg_fps())
             
         transform         = self.__build_transform()
-        frame_indices     = self.__get_index(fps       = fps,
-                                            max_frame = max_frame)
+        frame_indices     = self.__get_index(fps = fps, max_frame = max_frame)
         frames            = vr.get_batch(frame_indices).asnumpy()
         
         pixel_values_list = []
@@ -172,17 +155,19 @@ class AnalyzeVideo:
         pixel_value = torch.stack(pixel_values_list)
         return pixel_value, timestamp
     
-    def __load_video_gpu(self, 
-                         video_path : str):
+    def __load_video_gpu(self, video_path : str):
         vr = VideoReader(video_path,
-                         ctx=cpu(0), 
-                         num_threads=1)
+                         ctx         = cpu(0), 
+                         num_threads = 1)
+        
         max_frame = len(vr) - 1
+        
         fps = float(vr.get_avg_fps())
         
         start_idx = 0
         end_idx = max_frame
         seg_size = (end_idx - start_idx) / self.num_seg
+        
         frame_indices = np.linspace(start_idx + seg_size / 2,
                                     end_idx - seg_size / 2,
                                     self.num_seg,
@@ -201,23 +186,29 @@ class AnalyzeVideo:
         
         mean = torch.tensor(IMAGENET_MEAN, device=frames.device).view(1, 3, 1, 1)
         std = torch.tensor(IMAGENET_STD, device=frames.device).view(1, 3, 1, 1)
+        
         frames = (frames - mean) / std
 
         timestamps = []
+        
         for idx in frame_indices:
             seconds = idx / fps
             timestamps.append(f"{int(seconds // 60):02d}:{seconds % 60:05.2f}")
         
         return frames, timestamps
         
-    def __transcribe_audio(self, 
-                           video_path : str):
-        with AudioExtractor(video_path = video_path, 
-                            mode       = "DL") as extractor:
+    def __transcribe_audio(self, video_path : str):
+        with AudioExtractor(video_path = video_path, mode = "DL") as extractor:
             transcript = extractor.transcript()
+            
         return transcript.strip()
     
-    def __extract_segments_frames(self,video_path: str, segments: int = 13, frames_per_segment: int = 3, input_size: int = 448):
+    def __extract_segments_frames(self, 
+                                  video_path         : str, 
+                                  segments           : int = 13, 
+                                  frames_per_segment : int = 3, 
+                                  input_size         : int = 448):
+        
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
@@ -244,13 +235,16 @@ class AnalyzeVideo:
                 continue
 
             frame_indices = np.linspace(seg_start, seg_end - 1, frames_per_segment, dtype=int)
+            
             frames_list   = []
             
             for idx in frame_indices:
                 cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
-                ret, frame = cap.read()
+                ret, frame   = cap.read()
+                
                 if not ret:
                     continue
+                
                 frame        = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 frame_pil    = Image.fromarray(frame)
                 frame_tensor = transform(frame_pil)
@@ -269,7 +263,9 @@ class AnalyzeVideo:
     def analyze(self,
                 video_path,
                 prompt = PROMPT):
+        
         self.__load_model()
+        
         pix_val, timestamp = self.__load_video_gpu(video_path=video_path)
         
         pix_val            = pix_val.to(torch.bfloat16).cuda()
@@ -296,10 +292,10 @@ class AnalyzeVideo:
                       video_paths : list,
                       output_path : str,
                       prompt      : str = PROMPT):
+        
         self.__load_model()
         
-        with VideoProcessor(num_seg        = self.num_seg,
-                            shot_threshold = 0.3,) as vp:
+        with VideoProcessor(num_seg = self.num_seg, shot_threshold = 0.3,) as vp:
             shot_frames_list, shot_times_list, durations = vp.process_videos(video_paths = video_paths)
         
         for vid_idx, ((shot_frames, shot_times), duration) in enumerate(zip(shot_frames_list, durations)):

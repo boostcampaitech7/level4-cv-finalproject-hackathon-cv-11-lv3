@@ -1,5 +1,5 @@
 import torch
-import numpy           as np
+import numpy           as     np
 from   time            import time
 from   angle_emb       import AnglE
 from   angle_emb.utils import cosine_similarity
@@ -12,15 +12,14 @@ class AngleSimilarity:
                  npz_file         : str,
                  top_k            : int = 5,
                  model_name       : str = MODEL_NAME, 
-                 pooling_strategy : str = 'cls', 
-                 device           : str = 'cuda'):
+                 pooling_strategy : str = 'cls'):
         
         self.input_text       = input_text
         self.npz_file         = npz_file
         self.top_k            = top_k
         self.device           = device if torch.cuda.is_available() else 'cpu'
         self.angle            = AnglE.from_pretrained(model_name, pooling_strategy=pooling_strategy)
-        # self.angle            = AnglE.from_pretrained(model_name, pooling_strategy=pooling_strategy)
+        
         if self.device.lower() == 'cuda':
             self.angle = self.angle.cuda()
         

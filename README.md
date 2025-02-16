@@ -1,24 +1,164 @@
 #  장면 탐색을 위한 Video to Text / Text to Frame 모델
 
 ## 🥇 팀 구성원
- 
-### 이상진, 유희석, 정지훈, 천유동, 임용섭, 박재우
+<table>
+    <tr>
+        <th align="center"><a href="https://github.com/DrunkLee">이상진</a></th>
+        <th align="center"><a href="https://github.com/youhs1125">유희석</a></th>
+        <th align="center"><a href="https://github.com/JJhun26">정지훈</a></th>
+        <th align="center"><a href="https://github.com/chunyudong">천유동</a></th>
+        <th align="center"><a href="https://github.com/subsup98">임용섭</a></th>
+        <th align="center"><a href="https://github.com/ssujaewoo">박재우</a></th>
+    </tr>
+    <tr>
+        <td align="center"><img src="https://github.com/user-attachments/assets/a95e8208-6cd7-4e9e-8268-1bc696bd56f7" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/328adcf5-4a22-48d6-983c-732202b529b0" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/c813d969-5442-4a52-80c4-f00d26dcd379" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/8d5fdffb-a81a-4da6-8c70-35b4d8402264" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/153869a0-abe4-4892-96aa-875a496f296d" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/c03fb329-2690-493c-9e01-4ef03dbb3d17" width="100"></td>
+    </tr>
+    <tr>
+        <td align="center">
+            👑 팀장<br>
+            🔹 Video 2 Text<br>
+            🔹 VLM Fine-Tuning<br>
+            🔹 최적화<br>
+            🔹 Prompt Engineering<br>
+            🔹 Streamlit
+        </td>
+        <td align="center">
+            🔹 Video 2 Text<br>
+            🔹 VLM Fine-Tuning<br>
+            🔹 Data Cleansing<br>
+            🔹 Data Labeling<br>
+            🔹 최적화
+        </td>
+        <td align="center">
+            🔹 Text 2 Frame<br>
+            🔹 Translation<br>
+            🔹 Data Cleansing<br>
+            🔹 Backend
+        </td>
+        <td align="center">
+            🔹 Text 2 Frame<br>
+            🔹 VLM Test<br>
+            🔹 Data Cleansing<br>
+            🔹 Data Labeling
+        </td>
+        <td align="center">
+            🔹 Text 2 Frame<br>
+            🔹 Backend<br>
+            🔹 Streamlit<br>
+            🔹 VLM Fine-Tuning
+        </td>
+        <td align="center">
+            🔹 Video 2 Text<br>
+            🔹 VLM Test<br>
+            🔹 Audio<br>
+            🔹 Transcription
+        </td>
+</tr>
+</table>
+
+
 
 ## 📅 프로젝트 일정
-프로젝트 전체 일정
+2025.01.10(금) ~ 2025.02.12(수)
 
-- 2025.01.10(금) ~ 2025.02.12(수)
+## 🔍 프로젝트 소개
+본 프로젝트는 `부스트캠프 AI Tech` 에서 진행한 해커톤 주제 중 하나인 `TVING`의 **장면 탐색을 위한 Video-to-Text & Text-to-Frame** 주제 입니다.
+
+비디오 탐색을 위한 **Video-to-Text 및 Text-to-Frame 모델**을 구축하여, 비디오 내용을 텍스트로 변환하고, **특정 텍스트와 가장 일치하는 장면**을 찾아주는 기능을 제공합니다.
 
 ## 📊 데이터셋
-Youtube-8M에서 제공하는 Movie Clip 데이터셋으로 다음과 같은 구성을 따릅니다. 
+- Youtube-8M (`Tag : Movieclips`)
+- Movie Clips 총 비디오 개수 : `1683개`
+- Movie Clips 접근 가능 개수 : `1216개`
+- **캡션 정보 없음**
 
-- 전체 비디오 개수 : 1216개
+## 🏗️ 프로젝트 구조
 
-  
-## 🚀 빠른 시작
-### Launch Streamlit
-1. Aistage의 server4로 접속
-2. /data/ephemeral/home/level4-cv-finalproject-hackathon-cv-11-lv3/final_project 폴더로 이동 후
+<details>
+<summary><span style="font-size: 20px; font-weight: bold">Project Structure</span></summary>
+
+```plaintext
+📦 project-root
+├── 📄 README.md
+├── 
+├── 📁 final_project
+│   │
+│   ├── 📜 main.py
+│   │
+│   ├── 📁 distribute
+│   │   ├── 📜 flask_video_processor.py
+│   │   ├── 📜 mainserver_flask.py
+│   │   └── 📜 subserver_flask.py
+│   │
+│   ├── 📁 models
+│   │   ├── 📜 add_embedding.py
+│   │   ├── 📜 analyze.py
+│   │   ├── 📜 angle_similarity.py
+│   │   ├── 📜 audio_model.py
+│   │   ├── 📜 clip_similarity.py
+│   │   ├── 📜 frame_extract.py
+│   │   ├── 📜 translation.py
+│   │   └── 📜 video_processor.py
+│   │
+│   ├── 📁 modules
+│   │   ├── 📜 flask_video_preprocess.py
+│   │   ├── 📜 text_to_frame.py
+│   │   ├── 📜 video_preprocess.py
+│   │   └── 📜 video_to_text.py
+│   │
+│   ├── 📜 requirements.txt
+│   └── 🛠️ setup.sh
+│   
+├── 📁 lora_train_json
+│   ├── 📜 test_split.jsonl
+│   ├── 📜 train_split.jsonl
+│   └── 📜 val_split.jsonl
+│   
+├── 📁 model_test
+│   ├── 📜 CogVLM2-llama2-caption.ipynb
+│   ├── 📜 InternVL2.5-8B-MPO.ipynb
+│   ├── 📜 InternVideo2-chat-8B.ipynb
+│   ├── 📜 LLaVA-NeXt-Video-7B-hf.ipynb
+│   ├── 📜 LLaVA-Video-7B-Qwen2.ipynb
+│   ├── 📜 LongVU_Qwen2_7B.ipynb
+│   ├── 📜 qwen2_test.ipynb
+│   ├── 📜 videoMAE2-giant.ipynb
+│   └── 📜 blip.ipynb
+│   
+├── 📁 utils
+│   ├── 📜 Pseudo_labeling.py
+│   ├── 📜 scene_split.py
+│   └── 📜 split_videos.ipynb
+│   
+└── 📁 wrap_up_report
+    └── 📜 최종_보고서_CV_프로젝트(11조).pdf
+```
+
+</details>
+
+## ⚙️ Settings
+본 프로젝트는 다음과 같은 환경에서 실행됩니다.
+- **운영체제** : `Linux`
+- **GPU** : `Tesla V100 32GB`
+- **PyTorch** : `2.1.0`
+- **CUDA** : `11.8`
+- **cuDNN** : `8.7.0`
+- **NVCC** : `11.8`
+- **Python** : `3.10`
+
+### 🔧 Setup
+추론에 필요한 `LoRA Weight`와 `.NPZ DB`, 패키지들을 설치합니다.
+``` bash
+chmod +x setup.sh
+sh setup.sh
+```
+
+### 🚀 Streamlit
 ```bash
 streamlit run main.py
 ```

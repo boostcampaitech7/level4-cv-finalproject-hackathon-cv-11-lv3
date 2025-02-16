@@ -13,8 +13,8 @@ class Translator:
     def __init__(self,
                  kr2en      : bool = False, 
                  mode       : str  = "API",
-                 model_name : str  = KO_EN_MODEL_NAME,
-                 ):
+                 model_name : str  = KO_EN_MODEL_NAME):
+        
         self.kr2en      = kr2en
         self.mode       = mode
         self.prompt     = "당신은 번역기입니다. 한국어를 영어로 번역하세요" if kr2en else "당신은 번역기입니다. 영어를 한국어로 번역하세요"
@@ -55,9 +55,9 @@ class Translator:
             gc.collect()
             torch.cuda.empty_cache()
     
-    def __dl_en2kr_translator(self, 
-                              response : str):
+    def __dl_en2kr_translator(self, response : str):
         self.__load_model()
+        
         CONVERSATION     =  [
                              {"role" : "system", "content": self.prompt},
                              {"role" : "user",   "content": response}
@@ -81,23 +81,26 @@ class Translator:
     def __dl_kr2en_translator(self, response: str):
         self.__load_model()
 
-        inputs = self.tokenizer(response, return_tensors="pt", padding=True, truncation=True).to("cuda")
+        inputs = self.tokenizer(response, 
+                                return_tensors= "pt", 
+                                padding       = True, 
+                                truncation    = True).to("cuda")
 
         result = self.model.generate(**inputs, max_new_tokens=256)
 
-        result_text = self.tokenizer.decode(result[0], skip_special_tokens=True).strip()
+        result_text = self.tokenizer.decode(result[0], skip_special_tokens = True).strip()
 
         self.__unload_model()
 
         return result_text
     
-    def __api_translator(self, 
-                       response : str):
+    def __api_translator(self, response : str):
         source = "ko" if self.kr2en else "en"
         target = "en" if self.kr2en else "ko"
             
         translator      = GoogleTranslator(source = source,
                                            target = target)
+        
         translator_text = translator.translate(text = response)
         return translator_text
     
@@ -107,7 +110,7 @@ class Translator:
             return self.__api_translator(response = response)
         elif self.mode == "DL":
             if self.kr2en:
-                return self.__dl_kr2en_translator(response  = response)
+                return self.__dl_kr2en_translator(response = response)
             else:
                 return self.__dl_en2kr_translator(response = response)
         else:

@@ -1,10 +1,10 @@
-import streamlit as st
 import tempfile
 import ffmpeg
+import streamlit          as     st
 from   models.analyze     import AnalyzeVideo
 from   models.translation import Translator
 
-def cut_video_ffmpeg(video_path: str, start_time: int, end_time: int):
+def cut_video_ffmpeg(video_path : str, start_time : int, end_time : int):
     try:
         print(f"🎬 비디오 파일 처리 중: {video_path}")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_out:
@@ -23,7 +23,7 @@ def cut_video_ffmpeg(video_path: str, start_time: int, end_time: int):
         print(f"❌ 비디오 컷팅 실패: {e}")
         return None, None
 
-def get_video_duration_ffmpeg(video_file):
+def get_video_duration_ffmpeg(video_file : str):
     if isinstance(video_file, str):
         temp_video_path = video_file
     else:
@@ -108,10 +108,10 @@ class Video2TextPage:
                         with AnalyzeVideo(use_audio = use_audio, num_seg = 32) as av:
                             response = av.analyze(video_path = st.session_state.clipped_video_path)
                         
-                        with Translator(kr2en = False,
-                                        mode  = mode) as t:
+                        with Translator(kr2en = False, mode  = mode) as t:
                             translated_text = t.translate(response = response)
                             print(translated_text)
+                            
                         st.success("✅ 추론 완료!")
                         st.text_area("📝 생성된 텍스트", translated_text, height=350)
 

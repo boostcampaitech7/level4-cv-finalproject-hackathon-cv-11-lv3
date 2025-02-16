@@ -1,14 +1,12 @@
-import streamlit     as st
-import tempfile
 import os
 import time
+import streamlit            as     st
 from   models.analyze       import AnalyzeVideo
 from   models.add_embedding import EmbeddingProcessor
 
 VIDEO_STORAGE_PATH = "/data/ephemeral/home/videos"
 
-def save_uploaded_file(uploaded_file, 
-                       save_dir = VIDEO_STORAGE_PATH):
+def save_uploaded_file(uploaded_file, save_dir = VIDEO_STORAGE_PATH):
     
     os.makedirs(save_dir, exist_ok = True)
     
@@ -16,6 +14,7 @@ def save_uploaded_file(uploaded_file,
     
     if len(base_name) < 20:
         video_id = base_name
+        
     else:
         video_id = base_name[-15:-4]
         
@@ -60,11 +59,10 @@ class VideoPreprocessingPage:
                 st.write("📜 비디오 추론 시작")
                 status_text.text("추론 중... 잠시만 기다려 주세요!")
                 
-                with AnalyzeVideo(use_audio  = False, 
-                                  num_seg    = 3, 
-                                  batch_size = 11) as av:
+                with AnalyzeVideo(use_audio  = False, num_seg    = 3, batch_size = 11) as av:
                     for idx, video_path in enumerate(video_paths):
                         status_text.text(f"📊 분석 진행 중: {idx+1}/{len(video_paths)} - {original_filenames[video_path]}")
+                        
                         av.fast_batch_analyze(video_paths = [video_path],
                                               output_path = "/data/ephemeral/home/json_output")
                         

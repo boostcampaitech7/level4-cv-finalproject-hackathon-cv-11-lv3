@@ -2,7 +2,6 @@ import os
 import gc
 import cv2
 import glob
-import numpy        as np
 import torch
 from   PIL          import Image
 from   time         import time
@@ -43,8 +42,8 @@ class ClipVideoProcessor:
     def find_video_file_by_movie_id(self, 
                                     video_dir : str, 
                                     movie_id  : str):
-        pattern = os.path.join(video_dir, 
-                               f"*{movie_id}*.mp4")
+        
+        pattern = os.path.join(video_dir, f"*{movie_id}*.mp4")
         files   = glob.glob(pattern)
         
         if files:
@@ -67,8 +66,7 @@ class ClipVideoProcessor:
         with torch.no_grad():
             text_features = self.clip_model.get_text_features(**text_inputs)
             
-        text_features = text_features / text_features.norm(dim     = -1, 
-                                                           keepdim = True)
+        text_features = text_features / text_features.norm(dim = -1, keepdim = True)
         
         cap = cv2.VideoCapture(video_file)
         
@@ -98,14 +96,13 @@ class ClipVideoProcessor:
             with torch.no_grad():
                 image_features = self.clip_model.get_image_features(**image_inputs)
                 
-            image_features = image_features / image_features.norm(dim     = -1, 
-                                                                  keepdim = True)
-            similarity     = (text_features * image_features).sum(dim=-1).item()
+            image_features = image_features / image_features.norm(dim = -1, keepdim = True)
+            similarity     = (text_features * image_features).sum(dim = -1).item()
             
             if similarity > best_similarity:
                 best_similarity = similarity
-                best_frame = frame.copy()
-                best_time  = t
+                best_frame      = frame.copy()
+                best_time       = t
                 
             t += sampling_interval
         

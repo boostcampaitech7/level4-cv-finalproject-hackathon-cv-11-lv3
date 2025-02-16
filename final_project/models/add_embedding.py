@@ -1,7 +1,7 @@
 import os
 import glob
 import json
-import numpy     as np
+import numpy     as     np
 import torch
 from   angle_emb import AnglE, Prompts
 from   time      import time
@@ -20,6 +20,7 @@ class EmbeddingProcessor:
         self.updated_npz_path  = updated_npz_path
         self.device            = device if torch.cuda.is_available() else 'cpu'
         self.angle             = AnglE.from_pretrained(model_name, pooling_strategy=pooling_strategy)
+        
         if self.device.lower() == 'cuda':
             self.angle = self.angle.cuda()
 
@@ -34,7 +35,8 @@ class EmbeddingProcessor:
         elapsed_time = time() - self.start_time
         print(f"⏳ [EmbeddingProcessor] 전체 실행 시간: {elapsed_time:.2f}초")
     
-    def __process_json_file(self, json_path):
+    def __process_json_file(self, json_path : str):
+        
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
@@ -56,11 +58,12 @@ class EmbeddingProcessor:
                                                                  to_numpy = True, 
                                                                  prompt   = Prompts.C)
                 timeline_embeddings[ts_key] = embedding[0]
+                
             file_embeddings[video_id]       = timeline_embeddings
         return file_embeddings
 
     @staticmethod
-    def load_existing_npz(npz_path):
+    def load_existing_npz(npz_path : str):
         if os.path.exists(npz_path):
             npz_data  = np.load(npz_path,
                                 allow_pickle = True)
