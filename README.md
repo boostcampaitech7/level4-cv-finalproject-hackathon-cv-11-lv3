@@ -19,46 +19,47 @@
         <td align="center"><img src="https://github.com/user-attachments/assets/c03fb329-2690-493c-9e01-4ef03dbb3d17" width="100"></td>
     </tr>
     <tr>
-        <td align="center">
-            👑 팀장<br>
-            🔹 Video 2 Text<br>
-            🔹 VLM Fine-Tuning<br>
-            🔹 최적화<br>
-            🔹 Prompt Engineering<br>
-            🔹 Streamlit
-        </td>
-        <td align="center">
-            🔹 Video 2 Text<br>
-            🔹 VLM Fine-Tuning<br>
-            🔹 Data Cleansing<br>
-            🔹 Data Labeling<br>
-            🔹 최적화
-        </td>
-        <td align="center">
-            🔹 Text 2 Frame<br>
-            🔹 Translation<br>
-            🔹 Data Cleansing<br>
-            🔹 Backend
-        </td>
-        <td align="center">
-            🔹 Text 2 Frame<br>
-            🔹 VLM Test<br>
-            🔹 Data Cleansing<br>
-            🔹 Data Labeling
-        </td>
-        <td align="center">
-            🔹 Text 2 Frame<br>
-            🔹 Backend<br>
-            🔹 Streamlit<br>
-            🔹 VLM Fine-Tuning
-        </td>
-        <td align="center">
-            🔹 Video 2 Text<br>
-            🔹 VLM Test<br>
-            🔹 Audio<br>
-            🔹 Transcription
-        </td>
+    <td align="center">
+        <strong>👑 팀장</strong><br>
+        <small>🔹 Video 2 Text</small><br>
+        <small>🔹 VLM Fine-Tuning</small><br>
+        <small>🔹 최적화</small><br>
+        <small>🔹 Prompt Engineering</small><br>
+        <small>🔹 Streamlit</small>
+    </td>
+    <td align="center">
+        <small>🔹 Video 2 Text</small><br>
+        <small>🔹 VLM Fine-Tuning</small><br>
+        <small>🔹 Data Cleansing</small><br>
+        <small>🔹 Data Labeling</small><br>
+        <small>🔹 최적화</small>
+    </td>
+    <td align="center">
+        <small>🔹 Text 2 Frame</small><br>
+        <small>🔹 Translation</small><br>
+        <small>🔹 Data Cleansing</small><br>
+        <small>🔹 Backend</small>
+    </td>
+    <td align="center">
+        <small>🔹 Text 2 Frame</small><br>
+        <small>🔹 VLM Test</small><br>
+        <small>🔹 Data Cleansing</small><br>
+        <small>🔹 Data Labeling</small>
+    </td>
+    <td align="center">
+        <small>🔹 Text 2 Frame</small><br>
+        <small>🔹 Backend</small><br>
+        <small>🔹 Streamlit</small><br>
+        <small>🔹 VLM Fine-Tuning</small>
+    </td>
+    <td align="center">
+        <small>🔹 Video 2 Text</small><br>
+        <small>🔹 VLM Test</small><br>
+        <small>🔹 Audio</small><br>
+        <small>🔹 Transcription</small>
+    </td>
 </tr>
+
 </table>
 
 
