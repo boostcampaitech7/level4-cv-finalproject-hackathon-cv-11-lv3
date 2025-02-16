@@ -11,54 +11,56 @@
         <th align="center"><a href="https://github.com/ssujaewoo">박재우</a></th>
     </tr>
     <tr>
-        <td align="center"><img src="https://github.com/user-attachments/assets/a95e8208-6cd7-4e9e-8268-1bc696bd56f7" width="100"></td>
-        <td align="center"><img src="https://github.com/user-attachments/assets/328adcf5-4a22-48d6-983c-732202b529b0" width="100"></td>
-        <td align="center"><img src="https://github.com/user-attachments/assets/c813d969-5442-4a52-80c4-f00d26dcd379" width="100"></td>
-        <td align="center"><img src="https://github.com/user-attachments/assets/8d5fdffb-a81a-4da6-8c70-35b4d8402264" width="100"></td>
-        <td align="center"><img src="https://github.com/user-attachments/assets/153869a0-abe4-4892-96aa-875a496f296d" width="100"></td>
-        <td align="center"><img src="https://github.com/user-attachments/assets/c03fb329-2690-493c-9e01-4ef03dbb3d17" width="100"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/a95e8208-6cd7-4e9e-8268-1bc696bd56f7" width="150"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/328adcf5-4a22-48d6-983c-732202b529b0" width="150"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/c813d969-5442-4a52-80c4-f00d26dcd379" width="150"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/8d5fdffb-a81a-4da6-8c70-35b4d8402264" width="150"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/153869a0-abe4-4892-96aa-875a496f296d" width="150"></td>
+        <td align="center"><img src="https://github.com/user-attachments/assets/c03fb329-2690-493c-9e01-4ef03dbb3d17" width="150"></td>
     </tr>
-    <tr>
+<tr>
     <td align="center">
         <strong>👑 팀장</strong><br>
-        <small>🔹 Video 2 Text</small><br>
-        <small>🔹 VLM Fine-Tuning</small><br>
-        <small>🔹 최적화</small><br>
-        <small>🔹 Prompt Engineering</small><br>
-        <small>🔹 Streamlit</small>
+        <sub>🔹 Video 2 Text</sub><br>
+        <sub>🔹 VLM Fine-Tuning</sub><br>
+        <sub>🔹 최적화</sub><br>
+        <sub>🔹 Prompt Engineering</sub><br>
+        <sub>🔹 Streamlit</sub>
     </td>
     <td align="center">
-        <small>🔹 Video 2 Text</small><br>
-        <small>🔹 VLM Fine-Tuning</small><br>
-        <small>🔹 Data Cleansing</small><br>
-        <small>🔹 Data Labeling</small><br>
-        <small>🔹 최적화</small>
+        <sub>🔹 Video 2 Text</sub><br>
+        <sub>🔹 VLM Fine-Tuning</sub><br>
+        <sub>🔹 Data Cleansing</sub><br>
+        <sub>🔹 Data Labeling</sub><br>
+        <sub>🔹 최적화</sub>
     </td>
     <td align="center">
-        <small>🔹 Text 2 Frame</small><br>
-        <small>🔹 Translation</small><br>
-        <small>🔹 Data Cleansing</small><br>
-        <small>🔹 Backend</small>
+        <sub>🔹 Text 2 Frame</sub><br>
+        <sub>🔹 Translation</sub><br>
+        <sub>🔹 Data Cleansing</sub><br>
+        <sub>🔹 Backend</sub>
     </td>
     <td align="center">
-        <small>🔹 Text 2 Frame</small><br>
-        <small>🔹 VLM Test</small><br>
-        <small>🔹 Data Cleansing</small><br>
-        <small>🔹 Data Labeling</small>
+        <sub>🔹 Text 2 Frame</sub><br>
+        <sub>🔹 VLM Test</sub><br>
+        <sub>🔹 Data Cleansing</sub><br>
+        <sub>🔹 Data Labeling</sub>
     </td>
     <td align="center">
-        <small>🔹 Text 2 Frame</small><br>
-        <small>🔹 Backend</small><br>
-        <small>🔹 Streamlit</small><br>
-        <small>🔹 VLM Fine-Tuning</small>
+        <sub>🔹 Text 2 Frame</sub><br>
+        <sub>🔹 Backend</sub><br>
+        <sub>🔹 Streamlit</sub><br>
+        <sub>🔹 VLM Fine-Tuning</sub>
     </td>
     <td align="center">
-        <small>🔹 Video 2 Text</small><br>
-        <small>🔹 VLM Test</small><br>
-        <small>🔹 Audio</small><br>
-        <small>🔹 Transcription</small>
+        <sub>🔹 Video 2 Text</sub><br>
+        <sub>🔹 VLM Test</sub><br>
+        <sub>🔹 Audio</sub><br>
+        <sub>🔹 Transcription</sub>
     </td>
 </tr>
+
+
 
 </table>
 
@@ -68,7 +70,7 @@
 2025.01.10(금) ~ 2025.02.12(수)
 
 ## 🔍 프로젝트 소개
-본 프로젝트는 `부스트캠프 AI Tech` 에서 진행한 해커톤 주제 중 하나인 `TVING`의 **장면 탐색을 위한 Video-to-Text & Text-to-Frame** 주제 입니다.
+본 프로젝트는 `부스트캠프 AI Tech` 에서 진행한 해커톤 주제 중 하나인 `TVING`의 **장면 탐색을 위한 Video-to-Text & Text-to-Frame**을 수행하였습니다.
 
 비디오 탐색을 위한 **Video-to-Text 및 Text-to-Frame 모델**을 구축하여, 비디오 내용을 텍스트로 변환하고, **특정 텍스트와 가장 일치하는 장면**을 찾아주는 기능을 제공합니다.
 
